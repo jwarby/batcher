@@ -52,6 +52,12 @@ module.exports = function (method, settings) {
 	var collectors = [];
 
 	function execute(callback) {
+		if (!interval) {
+			return setImmediate(function () {
+				run(callback);
+			});
+		}
+
 		return setTimeout(function () {
 			run(callback);
 		}, interval);
@@ -74,6 +80,7 @@ module.exports = function (method, settings) {
 		var executor = get(executors, callback);
 		if (executor) {
 			clearTimeout(executor);
+			clearImmediate(executor);
 		}
 		set(executors, callback, execute(callback));
 

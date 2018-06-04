@@ -208,3 +208,22 @@ test.cb('should aggregate by callback instance', t => {
 		t.end();
 	}, 0);
 });
+
+test.cb('should not batch calls when interval=0 and setImmediate is used', t => {
+	t.plan(2);
+
+	const myMethod = sinon.spy();
+
+	const batch = batcher(myMethod);
+
+	batch({id: 1});
+	setImmediate(() => {
+		batch({id: 2});
+
+		setImmediate(() => {
+			t.true(myMethod.calledWith([{id: 1}]));
+			t.true(myMethod.calledWith([{id: 2}]));
+			t.end();
+		});
+	});
+});
